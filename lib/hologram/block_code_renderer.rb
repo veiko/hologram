@@ -8,7 +8,11 @@ module Hologram
     end
 
     def render
-      if is_table? && table_template
+      if is_template?
+        template = File.read(code.strip!)
+        example = example_class.new(template)
+        ERB.new(example_template).result(example.get_binding)
+      elsif is_table? && table_template
         examples = code.split("\n\n").map { |code_snippet| example_class.new(code_snippet) }
         ERB.new(table_template).result(binding)
       else
@@ -40,6 +44,10 @@ module Hologram
 
     def is_table?
       markdown_language && markdown_language.include?('example_table')
+    end
+
+    def is_template?
+      markdown_language && markdown_language.include?('example_template')
     end
   end
 end
